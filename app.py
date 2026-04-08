@@ -292,6 +292,15 @@ def run_rule_based_baseline(seed: int = 42) -> Dict[str, Any]:
         ),
     }
 
+from fastapi.responses import RedirectResponse
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse("/docs")
+
+@app.get("/")
+def home():
+    return {"message": "Quantflow API running "}
 
 if __name__ == "__main__":
     import uvicorn
