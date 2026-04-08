@@ -57,7 +57,7 @@ class TreasurySimulator:
         self.cumulative_reward: float = 0.0
         self._transfer_counter: int = 0
 
-        # Resolve probabilistic inflows upfront for reproducibility
+        #Resolve probabilistic inflows upfront for reproducibility
         if self.seed_randomness:
             self._resolve_uncertain_inflows()
 
@@ -111,16 +111,16 @@ class TreasurySimulator:
             "emergency_fund_penalty": 0.0,
         }
 
-        # 1. Settle pending transfers
+        #1.Settle pending transfers
         self._settle_transfers(info)
 
-        # 2. Apply scheduled inflows for today
+        #2.Apply scheduled inflows for today
         self._apply_inflows(info)
 
-        # 3. Auto-pay due obligations (by priority)
+        #3.Auto-pay due obligations (by priority)
         self._pay_obligations(info, reward_components)
 
-        # 4. Execute agent action
+        #4.Execute agent action
         action_result = self._execute_action(action, info, reward_components)
         self.action_history.append({
             "day": self.day,
@@ -128,19 +128,19 @@ class TreasurySimulator:
             "result": action_result,
         })
 
-        # 5. Apply investment yield
+        #5.Apply investment yield
         self._apply_investment_yield(reward_components)
 
-        # 6. Check overdrafts on all accounts
+        #6.Check overdrafts on all accounts
         self._check_overdrafts(info, reward_components)
 
-        # 7. Reward for buffer compliance
+        #7.Reward for buffer compliance
         self._check_buffer_compliance(reward_components)
 
-        # 8. Penalize idle cash
+        #8.Penalize idle cash
         self._check_idle_cash(reward_components)
 
-        # Compute total reward
+        #Compute total reward
         total_reward = sum(reward_components.values())
         self.cumulative_reward += total_reward
         self.reward_history.append(total_reward)
@@ -168,10 +168,10 @@ class TreasurySimulator:
     def _apply_inflows(self, info: Dict):
         for inflow in self.inflows:
             if inflow.due_day == self.day and not inflow.realized:
-                # Mark as realized (certain inflows always arrive; uncertain were pre-resolved)
+                #Mark as realized (certain inflows always arrive; uncertain were pre-resolved)
                 if not self.seed_randomness or inflow.probability >= 1.0:
                     inflow.realized = True
-                # For seed_randomness tasks, `realized` was already set in __init__
+                #For seed_randomness tasks, `realized` was already set in __init__
 
                 if inflow.realized:
                     acc = self.accounts.get(inflow.account_id)
@@ -206,7 +206,7 @@ class TreasurySimulator:
                     f"✓ Paid {obl.description}: ${obl.amount:,.0f} from {obl.account_id}"
                 )
             else:
-                # Missed payment — will be picked up in overdraft/missed logic
+                #Missed payment — will be picked up in overdraft/missed logic
                 priority_str = obl.priority.value if hasattr(obl.priority, 'value') else str(obl.priority)
                 if priority_str == "critical":
                     rc["missed_payment_penalty"] -= 2.0
@@ -260,15 +260,15 @@ class TreasurySimulator:
             if amount == 0:
                 return {"success": False, "message": "Insufficient funds for transfer"}
 
-        # Charge fee
+        #Charge fee
         fee = self.rates.transfer_fee_flat + (amount * self.rates.transfer_fee_pct)
         if src.balance < amount + fee:
             fee = max(0, src.balance - amount)
         src.balance -= (amount + fee)
         self.total_fees_paid += fee
-        rc["transfer_cost_penalty"] -= (fee / 1000.0)  # Small penalty for fee drag
+        rc["transfer_cost_penalty"] -= (fee / 1000.0)  #Small penalty for fee drag
 
-        # Create pending transfer (T+N settlement)
+        #Create pending transfer (T+N settlement)
         self._transfer_counter += 1
         transfer_id = f"TXN-{self.day:02d}-{self._transfer_counter:03d}"
         settlement_day = self.day + self.rates.transfer_settlement_days
@@ -296,7 +296,7 @@ class TreasurySimulator:
         src_id = action.source_account or "operating"
         amount = action.amount
 
-        # Find an investment account
+        #Find an investment account
         inv_accounts = [a for a in self.accounts.values() if a.is_investment]
         if not inv_accounts:
             return {"success": False, "message": "No investment account available"}
@@ -306,7 +306,7 @@ class TreasurySimulator:
         if not src:
             return {"success": False, "message": f"Source account {src_id} not found"}
 
-        # Keep buffer
+        #Keep buffer
         available = max(0, src.balance - self.buffer_target)
         amount = min(amount, available)
         if amount <= 0:
@@ -316,7 +316,7 @@ class TreasurySimulator:
         src.balance -= (amount + fee)
         inv_acc.balance += amount
         self.total_fees_paid += fee
-        rc["sweep_efficiency"] += 0.1  # Reward for proactive investing
+        rc["sweep_efficiency"] += 0.1  #Reward for proactive investing
 
         return {
             "success": True,
@@ -368,7 +368,7 @@ class TreasurySimulator:
         dst.balance += (amount - fee)
         self.emergency_funds_used += amount
         self.total_fees_paid += fee
-        rc["emergency_fund_penalty"] -= 0.5  # Penalty for using expensive line
+        rc["emergency_fund_penalty"] -= 0.5  #Penalty for using expensive line
 
         return {
             "success": True,
@@ -386,7 +386,7 @@ class TreasurySimulator:
                 self.realized_pnl += daily_yield
                 total_yield += daily_yield
         if total_yield > 0:
-            rc["sweep_efficiency"] += 0.1  # Reward for yield generation
+            rc["sweep_efficiency"] += 0.1  #Reward for yield generation
 
     def _check_overdrafts(self, info: Dict, rc: Dict):
         for acc in self.accounts.values():
@@ -404,7 +404,7 @@ class TreasurySimulator:
         if primary:
             if primary.balance >= self.buffer_target:
                 rc["buffer_compliance"] += 0.2
-            # Partial credit for being close to buffer
+            #Partial credit for being close to buffer
             elif primary.balance >= self.buffer_target * 0.75:
                 rc["buffer_compliance"] += 0.05
 
@@ -460,7 +460,7 @@ class TreasurySimulator:
             if primary.balance < 0:
                 flags.append(f"OVERDRAFT: operating at ${primary.balance:,.0f}")
 
-        # Check upcoming critical obligations
+        #Check upcoming critical obligations
         for obl in self.obligations:
             if not obl.paid and obl.due_day <= self.day + 2:
                 priority_str = obl.priority.value if hasattr(obl.priority, 'value') else str(obl.priority)
