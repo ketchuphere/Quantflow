@@ -15,7 +15,7 @@ import json
 import time
 from typing import Optional, Dict, Any, List
 from contextlib import asynccontextmanager
-
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -302,6 +302,13 @@ def root():
 def home():
     return {"message": "Quantflow API running "}
 
+def main():
+    uvicorn.run(
+        "server.app:app",
+        host="0.0.0.0",
+        port=7860,
+        reload=False
+    )
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=7860, reload=False)
+    main()
