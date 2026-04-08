@@ -1,0 +1,90 @@
+name: treasury_cash_position_planner
+version: "1.0.0"
+display_name: "Quantflow — Treasury Cash Position Planner"
+description: >
+  A real-world treasury operations simulation where an agent manages cash across
+  multiple bank accounts, forecasts inflows/outflows, sweeps surplus to investments,
+  and avoids overdrafts while meeting all obligations. Models genuine treasury
+  desk workflows: daily cash positioning, liquidity planning, and short-term investing.
+domain: finance
+tags:
+  - treasury
+  - liquidity
+  - cash-management
+  - planning
+  - multi-account
+  - openenv
+
+tasks:
+  - id: task_1_daily_funding
+    name: "Daily Funding"
+    difficulty: easy
+    description: >
+      Keep the operating account above a minimum buffer and pay all due obligations.
+      Single account, no randomness, deterministic cash flows.
+    max_steps: 7
+    success_threshold: 0.7
+
+  - id: task_2_sweep_optimization
+    name: "Sweep Optimization"
+    difficulty: medium
+    description: >
+      Fund obligations while sweeping surplus cash into a low-risk investment account.
+      Two accounts, transfer fees, 7-day forecast, yield optimization.
+    max_steps: 7
+    success_threshold: 0.65
+
+  - id: task_3_multi_account_liquidity
+    name: "Multi-Account Liquidity Planning"
+    difficulty: hard
+    description: >
+      Manage 4 accounts with uncertain inflows, staggered obligations, payment priorities,
+      transfer delays, and emergency funding options. Maximize cash efficiency across the week.
+    max_steps: 14
+    success_threshold: 0.55
+
+observation_space:
+  type: object
+  fields:
+    day: integer
+    balances: "dict[str, float]"
+    scheduled_inflows: "list[CashFlowEvent]"
+    scheduled_outflows: "list[Obligation]"
+    pending_transfers: "list[PendingTransfer]"
+    liquidity_buffer_target: float
+    rates_and_fees: RatesAndFees
+    risk_flags: "list[str]"
+    investment_balance: float
+    horizon_days: integer
+
+action_space:
+  type: object
+  fields:
+    action_type:
+      type: string
+      enum: [transfer, invest, redeem, hold, emergency_fund]
+    source_account:
+      type: string
+      nullable: true
+    destination_account:
+      type: string
+      nullable: true
+    amount:
+      type: float
+      minimum: 0
+    reference_id:
+      type: string
+      nullable: true
+
+reward_range: [-10.0, 5.0]
+
+api:
+  reset: "POST /reset"
+  step: "POST /step"
+  state: "GET /state"
+  tasks: "GET /tasks"
+  grader: "GET /grader"
+  baseline: "POST /baseline"
+
+author: "Quantflow Team"
+license: MIT
