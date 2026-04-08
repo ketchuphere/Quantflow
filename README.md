@@ -1,28 +1,10 @@
----
-title: Quantflow Treasury Cash Position Planner
-emoji: 🏦
-colorFrom: indigo
-colorTo: green
-sdk: docker
-app_port: 7860
-tags:
-  - openenv
-  - treasury
-  - finance
-  - rl
-  - simulation
-  - cash-management
-pinned: false
----
 
-# 🏦 Quantflow — Treasury Cash Position Planner
+# Quantflow(Treasury Cash Position Planner)
 
-> *An AI agent that thinks like a CFO — managing millions in cash, juggling payments, and maximizing returns. Every. Single. Day.*
+> *An AI agent that thinks like a CFO managing millions in cash, juggling payments, and maximizing returns. Every. Single. Day.*
 
 [![OpenEnv](https://img.shields.io/badge/OpenEnv-compliant-blue)](https://openenv.dev)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-brightgreen)](https://python.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
 ---
 
 ## The Problem We're Solving
@@ -30,10 +12,10 @@ pinned: false
 Every morning at a real company, a treasury team sits down and answers the same stressful questions:
 
 - *Do we have enough cash to make payroll on Friday?*
-- *We have $500K sitting idle — should we sweep it into the money market?*
+- *We have $500K sitting idle should we sweep it into the money market?*
 - *A $120K supplier payment is due today but our operating account is at $80K — what do we do?*
 
-This is **cash positioning** — one of the most consequential operational tasks in corporate finance. Get it wrong and you miss payroll. Get it right and you earn millions in yield on idle cash.
+This is **cash positioning** one of the most consequential operational tasks in corporate finance. Get it wrong and you miss payroll. Get it right and you earn millions in yield on idle cash.
 
 **Quantflow** turns this into a learning environment where AI agents can master treasury operations through trial, reward, and iteration.
 
@@ -56,7 +38,7 @@ Most finance AI demos are just sentiment classifiers or stock price predictors. 
 
 ## The Three Challenges
 
-### 🟢 Task 1 — Daily Funding `(Easy)`
+### Task 1 — Daily Funding `(Easy)`
 
 **Scenario:** Single operating account. $120K balance. 4 payments due over 7 days totalling $135K. Inflows arrive in between.
 
@@ -66,9 +48,9 @@ Most finance AI demos are just sentiment classifiers or stock price predictors. 
 
 ---
 
-### 🟡 Task 2 — Sweep Optimization `(Medium)`
+### Task 2 — Sweep Optimization `(Medium)`
 
-**Scenario:** Two accounts — operating and a money market sweep. Transfer fees apply. Funds take 1 day to settle (T+1).
+**Scenario:** Two accounts : operating and a money market sweep. Transfer fees apply. Funds take 1 day to settle (T+1).
 
 **Agent must:** Pay all 5 obligations across 7 days *and* maximize yield by sweeping surplus into the investment account. Timing matters — sweep too late and you earn nothing; sweep too much and you cannot pay tomorrow's bills.
 
@@ -76,11 +58,11 @@ Most finance AI demos are just sentiment classifiers or stock price predictors. 
 
 ---
 
-### 🔴 Task 3 — Multi-Account Liquidity Planning `(Hard)`
+### Task 3 — Multi-Account Liquidity Planning `(Hard)`
 
 **Scenario:** 4 accounts. 14 days. 12 obligations across priority tiers. 7 inflows, 4 of which are probabilistic (might not arrive). T+1 settlement throughout.
 
-**Agent must:** Pre-fund payroll before the deadline, protect critical debt service payments, invest surplus for yield, and never trigger an overdraft — all while uncertain whether three key client payments will actually arrive.
+**Agent must:** Prefund payroll before the deadline, protect critical debt service payments, invest surplus for yield, and never trigger an overdraft — all while uncertain whether three key client payments will actually arrive.
 
 **Scoring threshold:** 0.55
 
@@ -131,7 +113,7 @@ A frontier LLM agent with good treasury reasoning should push Task 3 above **0.8
 
 ---
 
-## Quickstart (Local — No Docker)
+## Quickstart (Local - No Docker)
 
 ### Step 1 — Install dependencies
 
@@ -461,7 +443,3 @@ treasury_cash_position_planner/
 ```
 
 ---
-
-## License
-
-MIT — use it, extend it, train on it.
