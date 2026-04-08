@@ -1,6 +1,6 @@
 name: treasury_cash_position_planner
 version: "1.0.0"
-display_name: "Quantflow — Treasury Cash Position Planner"
+display_name: "Quantflow Treasury Cash Position Planner"
 description: >
   A real-world treasury operations simulation where an agent manages cash across
   multiple bank accounts, forecasts inflows/outflows, sweeps surplus to investments,
@@ -85,6 +85,3 @@ api:
   tasks: "GET /tasks"
   grader: "GET /grader"
   baseline: "POST /baseline"
-
-author: "Quantflow Team"
-license: MIT
