@@ -422,8 +422,8 @@ treasury_cash_position_planner/
 ├── inference.py              ← LLM agent script (start here for AI runs)
 ├── run_checks.py             ← Full pre-submission validation
 │
-├── Server/
-|   ├── app.py                    ← FastAPI server — all 7 HTTP endpoints
+├── server/
+|   ├── app.py                ← FastAPI server — all 7 HTTP endpoints
 |
 ├── src/treasury_env/
 │   ├── env.py                ← reset() / step() / state()
