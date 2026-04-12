@@ -420,9 +420,11 @@ What the agent sees each step:
 treasury_cash_position_planner/
 │
 ├── inference.py              ← LLM agent script (start here for AI runs)
-├── app.py                    ← FastAPI server — all 7 HTTP endpoints
 ├── run_checks.py             ← Full pre-submission validation
 │
+├── Server/
+|   ├── app.py                    ← FastAPI server — all 7 HTTP endpoints
+|
 ├── src/treasury_env/
 │   ├── env.py                ← reset() / step() / state()
 │   ├── simulator.py          ← Day logic, fees, rewards, T+1 settlement
