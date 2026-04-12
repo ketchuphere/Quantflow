@@ -25,7 +25,7 @@ import json
 import re
 import textwrap
 import argparse
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, final
 from openai import OpenAI
 
 #Treasury environment
@@ -238,17 +238,17 @@ def run_episode(
     env = TreasuryCashPositionPlanner()
     obs = env.reset(task_id=task_id, seed=seed)
     obs_dict = obs.dict()
-
+    print(f"[START] task={task_id}", flush=True)
     step_rewards: List[float] = []
     action_log:   List[Dict[str, Any]] = []
     done = False
     step = 0
 
     if verbose:
-        print(f"\n{'='*65}")
+        print(f"\n")
         print(f"  TASK: {task_id}  |  seed={seed}  |  model={MODEL_NAME}")
         print(f"  Initial balances: { {k: f'${v:,.0f}' for k,v in obs_dict['balances'].items()} }")
-        print(f"{'='*65}")
+        print(f"\n")
 
     while not done and step < MAX_STEPS:
         step += 1
@@ -288,6 +288,7 @@ def run_episode(
             obs_dict = obs.dict()
 
         step_rewards.append(reward.total)
+        print(f"[STEP] step={step} reward={reward.total}", flush=True)
         action_log.append({
             "day": step,
             "action": action_dict,
@@ -305,10 +306,13 @@ def run_episode(
 
     
     final = env.grade()
+    epsilon = 1e-3
+    safe_score = max(min(final.overall, 1 - epsilon), epsilon)
+    print(f"[END] task={task_id} score={safe_score} steps={step}", flush=True)
 
     if verbose:
         print(f"\n{'─'*65}")
-        print(f"  FINAL SCORE:      {final.overall:.4f}")
+        print(f"  FINAL SCORE:      {safe_score:.4f}")
         print(f"  payment_rate:     {final.payment_rate:.4f}")
         print(f"  liquidity_safety: {final.liquidity_safety:.4f}")
         print(f"  efficiency:       {final.efficiency:.4f}")
@@ -317,18 +321,18 @@ def run_episode(
         print(f"  steps:            {step}")
 
     return {
-        "task_id":           task_id,
-        "model":             MODEL_NAME,
-        "seed":              seed,
-        "score":             final.overall,
-        "payment_rate":      final.payment_rate,
-        "liquidity_safety":  final.liquidity_safety,
-        "efficiency":        final.efficiency,
-        "compliance":        final.compliance,
+        "task_id": task_id,
+        "model": MODEL_NAME,
+        "seed": seed,
+        "score": safe_score,
+        "payment_rate": final.payment_rate,
+        "liquidity_safety": final.liquidity_safety,
+        "efficiency": final.efficiency,
+        "compliance": final.compliance,
         "cumulative_reward": round(sum(step_rewards), 4),
-        "steps":             step,
-        "action_log":        action_log,
-        "details":           final.details,
+        "steps": step,
+        "action_log": action_log,
+        "details": final.details
     }
 
 
@@ -362,12 +366,12 @@ def main() -> None:
 
     task_ids = [args.task] if args.task else TASK_IDS
 
-    print(f"\n{'#'*65}")
+    print(f"\n")
     print(f"  Quantflow — Treasury Cash Position Planner")
     print(f"  Inference script  |  model: {MODEL_NAME}")
     print(f"  API base: {API_BASE_URL}")
     print(f"  Seed: {args.seed}  |  Tasks: {len(task_ids)}")
-    print(f"{'#'*65}")
+    print(f"{'-'*30}")
 
     all_results: List[Dict[str, Any]] = []
 
@@ -381,18 +385,18 @@ def main() -> None:
         all_results.append(result)
 
    
-    print(f"\n{'='*65}")
+    print(f"\n")
     print("  INFERENCE SUMMARY")
-    print(f"{'='*65}")
+    print(f"{'-'*40}")
     print(f"  {'Task':<42} {'Score':>8}")
-    print(f"  {'-'*52}")
+    print(f"\n")
     for r in all_results:
         name = r["task_id"].replace("task_", "T").replace("_", " ")
         print(f"  {name:<42} {r['score']:>8.4f}")
     mean = sum(r["score"] for r in all_results) / len(all_results)
-    print(f"  {'-'*52}")
+    print(f"\n")
     print(f"  {'Mean score':<42} {mean:>8.4f}")
-    print(f"{'='*65}\n")
+    print(f"\n")
 
     
     output_path = args.output or "inference_results.json"
